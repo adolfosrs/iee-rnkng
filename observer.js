@@ -1,0 +1,70 @@
+import dayjs from 'dayjs'
+
+import { database } from './firebase.js'
+import { notify } from './notification.js'
+
+async function getLastReleaseRanking() {
+  const yesterdayYMD = dayjs().subtract(1, 'days').format('YYYYMMDD')
+  const snap = await database.ref('releases').orderByKey().endAt(yesterdayYMD).limitToLast(1).once('value')
+  const lastRelease = Object.values(snap.val() || {})?.[0]
+
+  return lastRelease?.ranking
+}
+
+async function getReleaseByYMD(ymd) {
+  const snap = await database.ref(`releases/${ymd}`).once('value')
+  return snap.val()
+}
+
+//observer will always trigger callback on first sync. so in case server restarts we should check it so we dont release on such scenario
+function checkHasRankingDiff(lastReleaseRanking, currentRanking) {
+  const hasDiff = Object.keys(currentRanking).some(associate => {
+    return currentRanking[associate].points !== lastReleaseRanking[associate].points
+  })
+  return hasDiff
+}
+
+function startObserver() {
+  database.ref('hot-rnkng').on('value', async snap => {
+    console.log('Observer Triggered')
+    const pointsByAssociates = snap.val()
+
+    if (pointsByAssociates) {
+      const lastReleaseRanking = await getLastReleaseRanking()
+      console.log('lastReleaseRanking', lastReleaseRanking)
+
+      const releaseRanking = Object.keys(pointsByAssociates).reduce((obj, associate) => {
+        obj[associate] = {
+          ...pointsByAssociates[associate],
+          prevRelease: {
+            points: lastReleaseRanking?.[associate]?.points || null,
+            position: lastReleaseRanking?.[associate]?.position || null
+          }
+        }
+        return obj
+      }, {})
+
+      const todayYMD = dayjs().format('YYYYMMDD')
+      const todayRelease = await getReleaseByYMD(todayYMD)
+
+      const latestReelaseRanking = todayRelease?.ranking || lastReleaseRanking?.ranking
+      if (true || !latestReelaseRanking || checkHasRankingDiff(latestReelaseRanking, releaseRanking)) {
+        console.log('!!!NEW RELEASE!!!')
+        database.ref(`releases/${todayYMD}`).set({
+          updatedAt: dayjs().toISOString(),
+          ranking: releaseRanking
+        })
+
+        notify(releaseRanking)
+      }
+    }
+
+    // database.ref(`associates-progress`).once('value', snap => {
+    //   const progressByAssociate = snap.val()
+
+    //   pointsByAssociates
+    // })
+  })
+}
+
+export { startObserver }
