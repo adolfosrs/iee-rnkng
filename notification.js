@@ -13,7 +13,9 @@ function formatMessage(ranking) {
   const detailedPositions = sortedNames.reduce((msg, name) => {
     const rnkngInfo = ranking[name]
     const positionChange = rnkngInfo.prevRelease?.position - rnkngInfo.position
-    const positionChangeText = positionChange > 0 ? `:arrow_up: ${positionChange}` : ''
+    const positivePositionChangeText = positionChange > 0 ? `:arrow_up: ${positionChange}` : ''
+    const negativePositionChangeText = positionChange < 0 ? `:small_red_triangle_down: ${positionChange * -1}` : ''
+    const positionChangeText = positivePositionChangeText || negativePositionChangeText
     const pointsChange = rnkngInfo.points - rnkngInfo.prevRelease?.points
     const pointsChangeText = (pointsChange && `(+${pointsChange})`) || ''
     return `${msg} ${rnkngInfo.position}º ${namesDictionary[name]}: ${rnkngInfo.points}${pointsChangeText} ${positionChangeText} \n`
