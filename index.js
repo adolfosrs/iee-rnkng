@@ -6,7 +6,7 @@ import puppeteer from 'puppeteer'
 import { startFirebase, database } from './firebase.js'
 import { startObserver } from './observer.js'
 
-const RANKING_URL = 'https://portaldoassociado-iee.com.br/s-info/rl_rankinghome.php'
+const RANKING_URL = 'https://portaldoassociado-iee.com.br/s-info/rl_rankinghome.php?associado_id=700'
 
 const PORT = process.env.PORT || 8888
 const HOST = process.env.HOST || '0.0.0.0'
