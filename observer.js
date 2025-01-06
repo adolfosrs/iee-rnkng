@@ -55,7 +55,7 @@ function startObserver() {
           ranking: releaseRanking
         })
 
-        notify(releaseRanking)
+        // notify(releaseRanking)
       }
     }
 
