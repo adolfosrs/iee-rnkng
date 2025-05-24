@@ -5,8 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "heroku-postbuild": "node node_modules/puppeteer/install.js"
+    "start": "node index.js"
   },
   "author": "adolfosrs",
   "license": "ISC",
@@ -17,6 +16,10 @@
     "express": "^4.18.2",
     "firebase-admin": "^11.10.1",
     "http": "^0.0.1-security",
-    "puppeteer": "^21.1.0"
+    "puppeteer": "^22.15.0"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
   }
 }
