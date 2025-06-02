@@ -1,10 +1,17 @@
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+import timezone from 'dayjs/plugin/timezone.js'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 import { database } from './firebase.js'
 import { notify } from './notification.js'
 
+const timezoneBR = 'America/Sao_Paulo'
+
 async function getLastReleaseRanking() {
-  const yesterdayYMD = dayjs().subtract(1, 'days').format('YYYYMMDD')
+  const yesterdayYMD = dayjs().tz(timezoneBR).subtract(1, 'days').format('YYYYMMDD')
   const snap = await database.ref('releases').orderByKey().endAt(yesterdayYMD).limitToLast(1).once('value')
   const lastRelease = Object.values(snap.val() || {})?.[0]
 
@@ -44,7 +51,7 @@ function startObserver() {
         return obj
       }, {})
 
-      const todayYMD = dayjs().format('YYYYMMDD')
+      const todayYMD = dayjs().tz(timezoneBR).format('YYYYMMDD')
       const todayRelease = await getReleaseByYMD(todayYMD)
 
       const latestReelaseRanking = todayRelease?.ranking || lastReleaseRanking?.ranking

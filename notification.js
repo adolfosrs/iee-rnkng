@@ -1,9 +1,15 @@
 import axios from 'axios'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+import timezone from 'dayjs/plugin/timezone.js'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 import { database } from './firebase.js'
 
 const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
+const timezoneBR = 'America/Sao_Paulo'
 
 let namesDictionary
 
@@ -21,7 +27,7 @@ function formatMessage(ranking) {
     return `${msg} ${rnkngInfo.position}º ${namesDictionary[name]}: ${rnkngInfo.points}${pointsChangeText} ${positionChangeText} \n`
   }, '')
 
-  const dateLabel = dayjs().format('D, MMMM, YYYY')
+  const dateLabel = dayjs().tz(timezoneBR).format('D, MMMM, YYYY')
   return `:wave: Atualização Ranking do IEE :statue_of_liberty: \n\n :spiral_calendar_pad: ${dateLabel} \n\n ${detailedPositions}`
 }
 
