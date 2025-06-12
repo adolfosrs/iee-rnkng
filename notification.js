@@ -23,7 +23,7 @@ function formatMessage(ranking) {
     const negativePositionChangeText = positionChange < 0 ? `:small_red_triangle_down: ${positionChange * -1}` : ''
     const positionChangeText = positivePositionChangeText || negativePositionChangeText
     const pointsChange = rnkngInfo.points - rnkngInfo.prevRelease?.points
-    const pointsChangeText = (pointsChange && `(+${pointsChange})`) || ''
+    const pointsChangeText = pointsChange ? (pointsChange > 0 ? `(+${pointsChange})` : `(${pointsChange})`) : ''
     return `${msg} ${rnkngInfo.position}º ${namesDictionary[name]}: ${rnkngInfo.points}${pointsChangeText} ${positionChangeText} \n`
   }, '')
 
