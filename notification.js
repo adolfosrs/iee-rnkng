@@ -8,8 +8,10 @@ dayjs.extend(timezone)
 
 import { database } from './firebase.js'
 
-const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
 const timezoneBR = 'America/Sao_Paulo'
+
+const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
+const BISPER_WEBHOOK = process.env.BISPER_WEBHOOK
 
 let namesDictionary
 
@@ -37,7 +39,11 @@ async function notify(ranking) {
     namesDictionary = namesSnap.val()
   }
 
-  axios.post(SLACK_WEBHOOK, { text: formatMessage(ranking) })
+  const message = formatMessage(ranking)
+  await Promise.all([
+    axios.post(SLACK_WEBHOOK, { text: message }),
+    axios.post(BISPER_WEBHOOK, { text: message })
+  ])
 }
 
 export { notify }
