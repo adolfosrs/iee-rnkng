@@ -4,7 +4,7 @@ import http from 'http'
 import puppeteer from 'puppeteer'
 
 import { startFirebase, database } from './firebase.js'
-import { startObserver } from './observer.js'
+import { startObserver, startReactionsObserver } from './observer.js'
 
 const RANKING_URL = 'https://portaldoassociado-iee.com.br/s-info/rl_rankinghome.php?associado_id=700'
 
@@ -18,6 +18,7 @@ app.listen(PORT, HOST, async () => {
   console.log('Server started on ' + HOST + ':' + PORT)
   await startFirebase()
   startObserver()
+  startReactionsObserver()
   syncRanking()
 })
 
