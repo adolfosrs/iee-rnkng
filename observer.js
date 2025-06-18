@@ -6,7 +6,7 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 import { database } from './firebase.js'
-import { notify } from './notification.js'
+import { notify, notifyReaction } from './notification.js'
 
 const timezoneBR = 'America/Sao_Paulo'
 
@@ -65,13 +65,51 @@ function startObserver() {
         notify(releaseRanking)
       }
     }
-
-    // database.ref(`associates-progress`).once('value', snap => {
-    //   const progressByAssociate = snap.val()
-
-    //   pointsByAssociates
-    // })
   })
 }
 
-export { startObserver }
+function startReactionsObserver() {
+  console.log('Starting reactions observer...')
+  
+  const observersStartedAt = dayjs().utc().format()
+  const observedAssociates = new Set()
+  
+  database.ref('reactions').on('child_added', async (snap) => {
+    console.log('New associate reactions detected:', snap.key)
+    if (!observedAssociates.has(snap.key)) {
+      observedAssociates.add(snap.key)
+      setupAssociateReactionsObserver(snap.key, observersStartedAt)
+    }
+  })
+  
+  database.ref('reactions').once('value', (snap) => {
+    const associates = snap.val() || {}
+    Object.keys(associates).forEach(associateKey => {
+      if (!observedAssociates.has(associateKey)) {
+        observedAssociates.add(associateKey)
+        setupAssociateReactionsObserver(associateKey, observersStartedAt)
+      }
+    })
+  })
+}
+
+function setupAssociateReactionsObserver(associateKey, observersStartedAt) {  
+  database.ref(`reactions/${associateKey}`).on('child_added', async (snap) => {
+    console.log('observersStartedAt', observersStartedAt)
+    const reaction = snap.val()
+    if (reaction && dayjs(reaction.createdAt).utc().isAfter(dayjs(observersStartedAt).utc())) {
+      const reactionData = {
+        associateName: associateKey,
+        emoji: reaction.emoji,
+        createdBy: reaction.createdBy || 'Anônimo',
+        message: reaction.message,
+        createdAt: reaction.createdAt
+      }
+      
+      console.log('Nova reação detectada:', reactionData)
+      await notifyReaction(reactionData)
+    }
+  })
+}
+
+export { startObserver, startReactionsObserver }
