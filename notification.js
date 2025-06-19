@@ -7,7 +7,6 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 import { database } from './firebase.js'
-import { getRecentReactions } from './reactions.js'
 
 const timezoneBR = 'America/Sao_Paulo'
 
@@ -32,22 +31,7 @@ function formatMessage(ranking, recentReactions = []) {
 
   const dateLabel = dayjs().tz(timezoneBR).format('D, MMMM, YYYY')
   
-  let message = `:wave: Atualização Ranking do IEE :statue_of_liberty: \n\n :spiral_calendar_pad: ${dateLabel} \n\n ${detailedPositions}`
-  
-  if (recentReactions.length > 0) {
-    const uniqueEmojis = [...new Set(recentReactions.map(r => r.emoji))]
-    const emojiCounts = uniqueEmojis.map(emoji => {
-      const count = recentReactions.filter(r => r.emoji === emoji).length
-      return `${emoji}${count > 1 ? ` (${count})` : ''}`
-    }).join(' ')
-    
-    const uniqueAssociates = [...new Set(recentReactions.map(r => r.associateName))]
-    
-    const totalReactions = recentReactions.length
-    const associateCount = uniqueAssociates.length
-    
-    message += `\n:mega: *Últimas reações*\n ${totalReactions} ${totalReactions === 1 ? 'reação' : 'reações'} para ${associateCount} associado${associateCount > 1 ? 's' : ''}\n\n   ${emojiCounts}`
-  }
+  const message = `:wave: Atualização Ranking do IEE :statue_of_liberty: \n\n :spiral_calendar_pad: ${dateLabel} \n\n ${detailedPositions}`
   
   return message
 }
@@ -58,8 +42,7 @@ async function notify(ranking) {
     namesDictionary = namesSnap.val()
   }
 
-  const recentReactions = await getRecentReactions()
-  const message = formatMessage(ranking, recentReactions)
+  const message = formatMessage(ranking)
 
   await Promise.all([
     axios.post(SLACK_WEBHOOK, { text: message }),
