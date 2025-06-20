@@ -13,6 +13,9 @@ const timezoneBR = 'America/Sao_Paulo'
 const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
 const BISPER_WEBHOOK = process.env.BISPER_WEBHOOK
 
+const BISPER_DEBOUNCE_INTERVAL = 3 * 60 * 60 * 1000
+let lastBisperNotification = dayjs().subtract(4, 'hour') // ensure first notification is sent
+
 let namesDictionary
 
 function formatMessage(ranking, recentReactions = []) {
@@ -44,14 +47,17 @@ async function notify(ranking) {
 
   const message = formatMessage(ranking)
 
-  await Promise.all([
-    axios.post(SLACK_WEBHOOK, { text: message }),
-    axios.post(BISPER_WEBHOOK, { text: message })
-  ])
+  const now = dayjs()
+  const shouldSendBisper = now.diff(lastBisperNotification, 'millisecond') >= BISPER_DEBOUNCE_INTERVAL
 
-  setTimeout(async () => {
-    await axios.post(BISPER_WEBHOOK, { text: '🔗 Acesse o ranking completo \n https://rankiee.com?code=rothbard' })
-  }, 60000)
+  const promises = [axios.post(SLACK_WEBHOOK, { text: message })]
+  
+  if (shouldSendBisper) {
+    promises.push(axios.post(BISPER_WEBHOOK, { text: message }))
+    lastBisperNotification = now
+  }
+
+  await Promise.all(promises)
 }
 
 async function notifyReaction(reaction) {
