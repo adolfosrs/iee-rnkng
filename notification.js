@@ -13,8 +13,8 @@ const timezoneBR = 'America/Sao_Paulo'
 const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
 const BISPER_WEBHOOK = process.env.BISPER_WEBHOOK
 
-const BISPER_DEBOUNCE_INTERVAL = 3 * 60 * 60 * 1000
-let lastBisperNotification = dayjs().subtract(4, 'hour') // ensure first notification is sent
+const BISPER_DEBOUNCE_INTERVAL = 4 * 60 * 60 * 1000 // 4 hours
+let lastBisperNotification = dayjs()
 
 let namesDictionary
 
