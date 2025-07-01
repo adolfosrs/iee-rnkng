@@ -14,7 +14,7 @@ const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
 const BISPER_WEBHOOK = process.env.BISPER_WEBHOOK
 
 const BISPER_DEBOUNCE_INTERVAL = 4 * 60 * 60 * 1000 // 4 hours
-let lastBisperNotification = dayjs().subtract(5, 'hour')
+let lastBisperNotification = dayjs().subtract(3, 'hour')
 
 let namesDictionary
 
