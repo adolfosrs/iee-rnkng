@@ -14,7 +14,7 @@ const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
 const BISPER_WEBHOOK = process.env.BISPER_WEBHOOK
 
 const BISPER_DEBOUNCE_INTERVAL = 4 * 60 * 60 * 1000 // 4 hours
-let lastBisperNotification = dayjs()
+let lastBisperNotification = dayjs().subtract(5, 'hour')
 
 let namesDictionary
 
@@ -49,6 +49,9 @@ async function notify(ranking) {
 
   const now = dayjs()
   const shouldSendBisper = now.diff(lastBisperNotification, 'millisecond') >= BISPER_DEBOUNCE_INTERVAL
+
+  console.log('lastBisperNotification', lastBisperNotification.format(), now.format())
+  console.log('shouldSendBisper', shouldSendBisper)
 
   const promises = [axios.post(SLACK_WEBHOOK, { text: message })]
   
