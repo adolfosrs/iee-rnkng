@@ -5,6 +5,7 @@ import puppeteer from 'puppeteer'
 
 import { startFirebase, database } from './firebase.js'
 import { startObserver, startReactionsObserver } from './observer.js'
+import { startGroupsObserver, updateGroupsRanking } from './groupsObserver.js'
 
 const RANKING_URL = 'https://portaldoassociado-iee.com.br/s-info/rl_rankinghome.php?associado_id=700'
 
@@ -19,6 +20,8 @@ app.listen(PORT, HOST, async () => {
   await startFirebase()
   startObserver()
   startReactionsObserver()
+  startGroupsObserver()
+  updateGroupsRanking()
   syncRanking()
 })
 
@@ -61,6 +64,7 @@ job(
   () => {
     console.log('Every 10 min task')
     syncRanking()
+    updateGroupsRanking()
     http.get(ENV_URL)
   },
   null,
