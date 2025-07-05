@@ -34,7 +34,7 @@ function formatMessage(ranking, recentReactions = []) {
 
   const dateLabel = dayjs().tz(timezoneBR).format('D, MMMM, YYYY')
   
-  const message = `:wave: Atualização Ranking do IEE :statue_of_liberty: \n\n :spiral_calendar_pad: ${dateLabel} \n\n ${detailedPositions}`
+  const message = `:wave: Ranking Individual do IEE :statue_of_liberty: \n\n :spiral_calendar_pad: ${dateLabel} \n\n ${detailedPositions}`
   
   return message
 }

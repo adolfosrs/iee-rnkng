@@ -28,13 +28,14 @@ function formatGroupsMessage(ranking) {
     const negativePositionChangeText = positionChange < 0 ? `:small_red_triangle_down: ${positionChange * -1}` : ''
     const positionChangeText = positivePositionChangeText || negativePositionChangeText
     const pointsChange = groupInfo.points - groupInfo.prevRelease?.points
-    const pointsChangeText = pointsChange ? (pointsChange > 0 ? `(+${pointsChange})` : `(${pointsChange})`) : ''
+    const pointsChangeFormatted = pointsChange ? Number(pointsChange.toFixed(2)) : null
+    const pointsChangeText = pointsChangeFormatted ? (pointsChangeFormatted > 0 ? `(+${pointsChangeFormatted})` : `(${pointsChangeFormatted})`) : ''
     return `${msg} ${groupInfo.position}º ${groupsNamesDictionary[groupName] || groupName}: ${groupInfo.points}${pointsChangeText} ${positionChangeText} \n`
   }, '')
 
   const dateLabel = dayjs().tz(timezoneBR).format('D, MMMM, YYYY')
   
-  const message = `:wave: Atualização Ranking de Grupos do IEE :statue_of_liberty: \n\n :spiral_calendar_pad: ${dateLabel} \n\n ${detailedPositions}`
+  const message = `:wave: Ranking de Grupos do IEE :statue_of_liberty: \n\n :spiral_calendar_pad: ${dateLabel} \n\n ${detailedPositions}`
   
   return message
 }
@@ -53,7 +54,7 @@ async function notifyGroups(ranking) {
   const promises = [axios.post(SLACK_WEBHOOK, { text: message })]
   
   if (shouldSendBisper) {
-    // promises.push(axios.post(BISPER_WEBHOOK, { text: message }))
+    promises.push(axios.post(BISPER_WEBHOOK, { text: message }))
     lastBisperNotification = now
   }
 
