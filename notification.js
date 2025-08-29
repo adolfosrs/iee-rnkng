@@ -53,14 +53,14 @@ async function notify(ranking) {
   console.log('lastBisperNotification', lastBisperNotification.format(), now.format())
   console.log('shouldSendBisper', shouldSendBisper)
 
-  const promises = [axios.post(BISPER_WEBHOOK, { text: message }, {
-    headers: {
-      'key': process.env.BISPER_API_KEY
-    }
-  })]
+  const promises = [axios.post(SLACK_WEBHOOK, { text: message })]
   
   if (shouldSendBisper) {
-    promises.push(axios.post(BISPER_WEBHOOK, { text: message }))
+    promises.push(axios.post(BISPER_WEBHOOK, { text: message }, {
+      headers: {
+        'key': process.env.BISPER_API_KEY
+      }
+    }))
     lastBisperNotification = now
   }
 
